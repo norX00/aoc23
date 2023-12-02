@@ -3,28 +3,34 @@ with open("day2.txt", "r") as of:
 
 
 class Game:
-    prio = {"red": 0, "green": 1, "blue": 2}
+    prio = ["red", "green", "blue"]
     limits = [12, 13, 14]
 
     def __init__(self, hist):
         prefix, sets = hist.split(": ")
+        self.sets_ = sets
         self.id = int(prefix.split(" ")[-1])
         self.sets = self.parse_game(sets)
 
     def parse_game(self, g):
         units = [
-            sorted(
-                [unit.split(" ") for unit in s.split(", ")],
-                key=lambda x: self.prio.get(x[1]),
-            )
+            {
+                color: int(num)
+                for num, color in [unit.split(" ") for unit in s.split(", ")]
+            }
             for s in g.split("; ")
         ]
-        sets = [[int(num) for num, _ in s] for s in units]
+        sets = [[s.get(col, 0) for col in self.prio] for s in units]
         return sets
 
     @property
     def is_possible(self):
-        possible = all([all([num <= self.limits[idx] for idx, num in enumerate(s)]) for s in self.sets])
+        possible = all(
+            [
+                all([num <= self.limits[idx] for idx, num in enumerate(s)])
+                for s in self.sets
+            ]
+        )
         return possible
 
 
