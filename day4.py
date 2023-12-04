@@ -15,3 +15,9 @@ def calc_points(num_set: set):
 # Part one
 cards = [c.split(": ")[-1].split(" | ") for c in data.split("\n")]
 print(sum([reduce(lambda x, y: calc_points(x & y), map(parse_nums, card)) for card in cards]))
+
+# Part two
+card_multiples = [1] * len(cards)
+for idx, card in (list(enumerate(cards)))[::-1]:
+    card_multiples[idx] += sum(card_multiples[idx + 1:idx + 1 + len(reduce(lambda x, y: x & y, map(parse_nums, card)))])
+print(sum(card_multiples))
