@@ -29,3 +29,25 @@ for i, sn in enumerate(seed_nums):
                 break
     seed_nums[i] = current
 print(min(seed_nums))
+
+# Part two
+seed_nums = [int(num) for num in seeds.split(" ")[1:]]
+min_location = max(seed_nums)
+for i in range(0, len(seed_nums), 2):
+    seed_low = seed_nums[i]
+    max_len = n = seed_nums[i + 1]
+    seed_next = seed_low
+    while seed_next <= seed_low + n:
+        current = seed_next
+        for m in maps:
+            for ln in m.split("\n")[1:]:
+                dest_start, src_start, range_len = [int(num) for num in ln.split(" ")]
+                if src_start <= current <= src_start + range_len:
+                    # maps are monotonically increasing within their preimage which is an interval of at most max_len
+                    max_len = max(min(max_len, src_start + range_len - current), 1)
+                    current += dest_start - src_start
+                    break
+        min_location = min(min_location, current)
+        seed_next += max_len
+        max_len = n - seed_next + seed_low
+print(min_location)
