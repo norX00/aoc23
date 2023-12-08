@@ -8,28 +8,18 @@ instructions_str, nodes_str = data.split("\n\n")
 nodes = {node: nb[1:-1].split(", ") for node, nb in map(lambda x: x.split(" = "), nodes_str.split("\n"))}
 
 
-def instructions():
-    instruction_map = {"L": 0, "R": 1}
-    for i in cycle(instructions_str):
-        yield instruction_map.get(i)
+def traverse(entrance, all_z=False):
+    def is_exit(e):
+        return e == "ZZZ" if all_z else e[-1] == "Z"
+
+    for step, instruction in enumerate(cycle(map("LR".index, instructions_str)), 1):
+        entrance = nodes.get(entrance)[instruction]
+        if is_exit(entrance):
+            return step
 
 
 # Part one
-current = "AAA"
-for step, instruction in enumerate(instructions(), 1):
-    current = nodes.get(current)[instruction]
-    if current == "ZZZ":
-        print(step)
-        break
-
+print(traverse("AAA"))
 
 # Part two
-least_common_multiple = 1
-for entrance in filter(lambda x: x[-1] == "A", nodes.keys()):
-    current = entrance
-    for step, instruction in enumerate(instructions(), 1):
-        current = nodes.get(current)[instruction]
-        if current[-1] == "Z":
-            least_common_multiple = lcm(least_common_multiple, step)
-            break
-print(least_common_multiple)
+print(lcm(*[traverse(e, False) for e in filter(lambda x: x[-1] == "A", nodes.keys())]))
