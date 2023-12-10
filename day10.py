@@ -28,4 +28,3 @@ while to_visit:
             to_visit.append((*neighbor_coords, maze[neighbor_coords]))
             edges.append({current[:2], neighbor_coords})
             visited.add(neighbor_coords)
-
