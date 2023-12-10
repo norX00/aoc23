@@ -2,29 +2,34 @@ with open("day10.txt", "r") as of:
     data = of.read().strip()
 
 maze = {(x, y): cell for x, row in enumerate(data.split("\n")) for y, cell in enumerate(row) if cell not in "."}
-x_max, y_max = max(maze)
-start_coords = [(*key, val) for key, val in maze.items() if val == "S"][0]
 
 
-def get_neighbor_coords(x, y, tile):
-    def valid_coords(c):
-        return (0 <= c[0] < x_max) and (0 <= c[1] < y_max)
-    return list(filter(valid_coords, {
+def get_neighbor_coords(x, y, tile=None):
+    if tile is None:
+        tile = maze[x, y]
+    return set({
         "|": [(x-1, y), (x+1, y)],
         "-": [(x, y-1), (x, y+1)],
         "L": [(x-1, y), (x, y+1)],
         "J": [(x-1, y), (x, y-1)],
         "7": [(x+1, y), (x, y-1)],
-        "F": [(x-1, y), (x, y+1)],
-        "S": [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
-    }.get(tile, [])))
+        "F": [(x+1, y), (x, y+1)],
+    }.get(tile, []))
 
 
-edges, to_visit, visited = [], [start_coords], set()
-while to_visit:
-    current = to_visit.pop()
-    for neighbor_coords in get_neighbor_coords(*current):
-        if neighbor_coords not in visited and neighbor_coords in maze:
-            to_visit.append((*neighbor_coords, maze[neighbor_coords]))
-            edges.append({current[:2], neighbor_coords})
-            visited.add(neighbor_coords)
+sx, sy = [key for key, val in maze.items() if val == "S"][0]
+start_neighbors = [nb for nb in [(sx-1, sy), (sx+1, sy), (sx, sy-1), (sx, sy+1)]
+                   if (sx, sy) in get_neighbor_coords(*nb)]
+maze[sx, sy] = [t for t in set(maze.values()) if get_neighbor_coords(sx, sy, t) == {*start_neighbors}][0]
+
+# Part one
+depth, visited, current = 1, {(sx, sy), *start_neighbors}, start_neighbors[0]
+while True:
+    next_neighbors = get_neighbor_coords(*current) - visited
+    if next_neighbors:
+        current = next_neighbors.pop()
+    if current in visited:
+        print(-(-(depth+1)//2))
+        break
+    depth += 1
+    visited.add(current)
