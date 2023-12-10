@@ -9,7 +9,6 @@ start_coords = [(*key, val) for key, val in maze.items() if val == "S"][0]
 def get_neighbor_coords(x, y, tile):
     def valid_coords(c):
         return (0 <= c[0] < x_max) and (0 <= c[1] < y_max)
-    print(tile)
     return list(filter(valid_coords, {
         "|": [(x-1, y), (x+1, y)],
         "-": [(x, y-1), (x, y+1)],
