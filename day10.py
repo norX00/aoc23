@@ -35,12 +35,12 @@ while True:
     visited.add(current)
 
 
-# Part 2
+# Part two
 enclosed_tiles = 0
 for x, row in enumerate(data.split("\n")):
-    enclosed = 0
+    enclosed = False
     for y, cell in enumerate(row):
         if (x, y) in visited:
-            enclosed = abs(enclosed - int(cell in "|LJ"))
+            enclosed = enclosed ^ (cell in "|LJ")
         enclosed_tiles += enclosed and (x, y) not in visited
 print(enclosed_tiles)
