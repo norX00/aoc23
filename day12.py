@@ -1,12 +1,18 @@
+from functools import lru_cache, partial
+
 with open("day12.txt", "r") as of:
     data = of.read().strip()
 
 
-def parse_rows(row):
+def parse_rows(row, unfold=False):
     record, occurrences = row.strip().split(" ")
-    return record, list(map(int, occurrences.split(",")))
+    if unfold:
+        record = "?".join([record]*5)
+        occurrences = ",".join([occurrences]*5)
+    return record, tuple(map(int, occurrences.split(",")))
 
 
+@lru_cache
 def arrangements_dp(problem):
     record, occurrences = problem
     damaged, lower_bound, upper_bound = sum(occurrences), record.count("#"), record.count("?") + record.count("#")
@@ -28,3 +34,6 @@ def arrangements_dp(problem):
 
 # Part one
 print(sum(map(arrangements_dp, map(parse_rows, data.split("\n")))))
+
+# Part two
+print(sum(map(arrangements_dp, map(partial(parse_rows, unfold=True), data.split("\n")))))
