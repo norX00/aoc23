@@ -1,33 +1,18 @@
-data = r""".|...\....
-|.-.\.....
-.....|-...
-........|.
-..........
-.........\
-..../.\\..
-.-.-/..|..
-.|....-|.\
-..//.|...."""
+with open("day16.txt", "r") as of:
+    data = of.read().strip()
 
 grid = data.split("\n")
-grid2 = [list(x) for x in grid[::]]
 num_rows, num_cols = len(grid), len(grid[0])
 
 
-def prettyprint(g):
-    for r in g:
-        print("".join(r))
-    print()
-
-
 def beam(point_to_directions):
+    energized = [list(x) for x in grid[::]]
     passed = set()
     while point_to_directions:
         p, direction = point_to_directions.pop()
         while (p, direction) not in passed:
             passed.add((p, direction))
-            grid2[p[0]][p[1]] = "#"
-            prettyprint(grid2)
+            energized[p[0]][p[1]] = "#"
             match direction:
                 case "r":
                     p = (p[0], p[1] + 1)
@@ -41,17 +26,31 @@ def beam(point_to_directions):
                 break
             match grid[p[0]][p[1]]:
                 case "|":
-                    direction = "d"
-                    point_to_directions.append((p, "u"))
+                    match direction:
+                        case "l" | "r":
+                            direction = "d"
+                            point_to_directions.append((p, "u"))
+                            point_to_directions.append((p, "d"))
                 case "-":
-                    direction = "l"
-                    point_to_directions.append((p, "r"))
+                    match direction:
+                        case "d" | "u":
+                            direction = "l"
+                            point_to_directions.append((p, "r"))
+                            point_to_directions.append((p, "l"))
                 case "/":
-                    direction = "u" if direction == "r" else "d"
+                    match direction:
+                        case "r": direction = "u"
+                        case "u": direction = "r"
+                        case "l": direction = "d"
+                        case "d": direction = "l"
                 case "\\":
-                    direction = "d" if direction == "r" else "u"
-    return passed
+                    match direction:
+                        case "r": direction = "d"
+                        case "u": direction = "l"
+                        case "l": direction = "u"
+                        case "d": direction = "r"
+    return energized
 
 
-beam([((0, 0), "r")])
-print(sum(map(lambda x: x.count("#"), grid2)))
+# Part one
+print(sum(map(lambda x: x.count("#"), beam([((0, -1), "r")]))))
