@@ -26,3 +26,16 @@ for instruction, steps, _ in [row.split(" ") for row in data.split("\n")]:
 
 # Part one
 print(picks_formula(gauss_area_formula(visited), edge_length))
+
+# Part two
+current, corners, edge_length = (0, 0), [], 0
+for _, _, code in [row.split(" ") for row in data.split("\n")]:
+    instruction, steps = [int(code[-2]), int(code[2:-2], 16)]
+    edge_length += int(steps)
+    corners.append(current)
+    match instruction:
+        case 0: current = (current[0]+int(steps), current[1])
+        case 2: current = (current[0]-int(steps), current[1])
+        case 1: current = (current[0], current[1]+int(steps))
+        case 3: current = (current[0], current[1]-int(steps))
+print(picks_formula(gauss_area_formula(corners), edge_length))
